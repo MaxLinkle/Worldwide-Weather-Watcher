@@ -1,4 +1,4 @@
-// Déclaration des bibliotèques (en sachant que la majorité ont etaient modifié)
+// Déclaration des bibliotèques (en sachant que la majorité ont étaient modifiées)
 #include <EEPROM.h>
 #include <SPI.h>
 #include <SD.h>
@@ -6,13 +6,13 @@
 #include <SoftwareSerial.h>
 #include <Adafruit_BME280.h>
 
-// Déclaration des comstantes
+// Déclaration des constantes
 #define chipSelect 4
 #define Nb_capteur 4
 #define PRESSURE_MIN_ALARME 850
 #define PRESSURE_MAX_ALARME 1080
 
-// Création et declaration des deux structures de données en global
+// Création et déclaration des deux structures de données en global
 typedef struct Capteur Capteur;
 struct Capteur{
   int Valeur;
@@ -31,7 +31,7 @@ struct GPS{
 };
 GPS Capteur_GPS;
 
-// Définition et récèption des variables reçus par l'eeprom
+// Définition et réception des variables reçus par l'eeprom
 #define LOGINTERVAL (EEPROM.get(1, (Capteur_L_TPH[0].Valeur))) //10
 #define MAX_SIZE (EEPROM.get(3, (Capteur_L_TPH[0].Valeur))) //2000
 #define TIMEOUT (EEPROM.get(5, (Capteur_L_TPH[0].Valeur)))
@@ -48,13 +48,12 @@ GPS Capteur_GPS;
 #define PRESSURE_MIN (EEPROM.get(27, (Capteur_L_TPH[0].Valeur)))//850
 #define PRESSURE_MAX (EEPROM.get(29, (Capteur_L_TPH[0].Valeur)))//1080
 
-// Déclation des diversses variables global
-DateTime horloge;
+// Déclation des diversses variables globales
 SoftwareSerial GPS_serial(4,5);
 
 boolean Mode_eco = false;
 
-  // variables global utilisé par les interruptions mise en "volatile" par mesure de sécurité
+  // variables globales utilisées par les interruptions mise en "volatile" par mesure de sécurité
 volatile boolean Tab_refus[7] = {false, false, false, false, false, false, false};
 volatile byte varCompteur1 = 0;
 volatile byte varCompteur2 = 0;
@@ -389,7 +388,7 @@ ISR(TIMER1_COMPA_vect){
 
 // INITIALISATION -----------------------------------------------------------------------------------------------------------------
 void setup_Interruption(){
-  // bouton sur les pins 2 et 3
+  // interruption (bouton) sur les pins 2 et 3
   pinMode(2,INPUT);
   pinMode(3,INPUT);
   attachInterrupt(digitalPinToInterrupt(2),Interruption,CHANGE);
@@ -505,7 +504,7 @@ void Lecture_Capteur(){
     if((Capteur_L_TPH[1]).Valeur>0){
       (Capteur_L_TPH+3) -> Valeur = floor(bme.readHumidity()); // Aquisition de l'humidité
 
-      if((Capteur_L_TPH[3]).Valeur < HYGR_MINT || (Capteur_L_TPH).Valeur > HYGR_MAXT){ // Vérification que l'humidité soit dans ses limites
+      if((Capteur_L_TPH[3]).Valeur < HYGR_MINT || (Capteur_L_TPH[3]).Valeur > HYGR_MAXT){ // Vérification que l'humidité soit dans ses limites
         (Capteur_L_TPH[3]).Valeur = -1;
       }
     }
@@ -523,7 +522,7 @@ void Gestion_erreur(){
 
   int Test = (Capteur_L_TPH[0]).Valeur;
 
-  else if(Capteur_L_TPH[1].Valeur < MIN_TEMP_AIR || Capteur_L_TPH[1].Valeur > MAX_TEMP_AIR){ // Vérificationt que la température de l'air soit dans ses limites
+  if(Capteur_L_TPH[1].Valeur < MIN_TEMP_AIR || Capteur_L_TPH[1].Valeur > MAX_TEMP_AIR){ // Vérification que la température de l'air soit dans ses limites
     Tab1 = true;
   }
 
@@ -623,33 +622,38 @@ void Envoie(){
 
   // Luminosite ****************************************************************
   doc += ("/Luminosite:");
-  if((Capteur_L_TPH[0]).Valeur < LUMIN_LOW){
-    doc += ("LOW");
+  if(LUMIN == 0){
+    doc += ("NA");
   }
-  else if((Capteur_L_TPH[0]).Valeur >= LUMIN_LOW && (Capteur_L_TPH[0]).Valeur < LUMIN_HIGH){
-    doc += ("MEDUIM");
-  }
-  else if((Capteur_L_TPH[0]).Valeur >= LUMIN_HIGH){
-    doc += ("HIGH");
+  else{
+    if((Capteur_L_TPH[0]).Valeur < LUMIN_LOW){
+      doc += ("LOW");
+    }
+    else if((Capteur_L_TPH[0]).Valeur >= LUMIN_LOW && (Capteur_L_TPH[0]).Valeur < LUMIN_HIGH){
+      doc += ("MEDUIM");
+    }
+    else if((Capteur_L_TPH[0]).Valeur >= LUMIN_HIGH){
+      doc += ("HIGH");
+    }
   }
   doc += '\n';
 
   // Temperature ***************************************************************
   doc += ("Temperature:");
-  if((Capteur_L_TPH[1]).Erreur){ // Envoie des données selon l'erreur du capteur
+  if((Capteur_L_TPH[1]).Erreur || TEMP_AIR == 0){ // Envoie des données selon l'erreur du capteur
     doc += ("NA");
   }
   else{
     doc += ((Capteur_L_TPH[1]).Valeur);
     doc += ("C/");
-    doc += (int)(floor(((Capteur_L_TPH[1]).Valeur)*(9/5)+32));
+    doc += (int)(floor(((Capteur_L_TPH[1]).Valeur)*(9/5)+32)); // Convertion de la températion en Fahrenheit
     doc += 'F';
   }
   doc += '\n';
 
   // Pression ******************************************************************
   doc += ("Pression:");
-  if((Capteur_L_TPH[2]).Erreur){  // Envoie des données selon l'erreur du capteur
+  if((Capteur_L_TPH[2]).Erreur || PRESSURE == 0){  // Envoie des données selon l'erreur du capteur
     doc += ("NA");
   }
   else{
@@ -660,7 +664,7 @@ void Envoie(){
 
   // Hygrometrie ***************************************************************
   doc += ("Hygrometrie:");
-  if((Capteur_L_TPH[3]).Valeur == -1 || (Capteur_L_TPH[3]).Erreur){  // Envoie des données selon l'erreur du capteur
+  if((Capteur_L_TPH[3]).Valeur == -1 || (Capteur_L_TPH[3]).Erreur || HYGR == 0){  // Envoie des données selon l'erreur du capteur
     doc += ("NA");
   }
   else{
@@ -668,7 +672,7 @@ void Envoie(){
   }
   doc += ("g/m3");
   doc += '\n';
-  // fin de la construction du texte a envoyer ---------------------------------
+  // fin de la construction du texte à envoyer ---------------------------------
 
   File file;
   unsigned long Size;
@@ -682,16 +686,15 @@ void Envoie(){
   Size = (512*volume.blocksPerCluster() * volume.clusterCount()) - root.size();
   root.close();
 
-  if(Size >= doc.length()){ // Vérification qu'il reste sufisament de place dans la carte SD
+  if(Size >= doc.length()){ // Vérification qu'il reste suffisament de place dans la carte SD
     Tab_refus[0] = false;
 
-    if(SD.exists(horloge.toString("YYMMDD"))){ // Vérification que le fichier de la journée exist
+    if(SD.exists(horloge.toString("YYMMDD"))){ // Vérification que le fichier de la journée existe
       while(1){
 
         if(j > 9){
           i++;
           j = 0;
-          // break;
         }
 
         chemin = (horloge.toString("YYMMDD/"));
@@ -707,7 +710,7 @@ void Envoie(){
         Size = file.size();
         file.close();
 
-        if(MAX_SIZE > (Size + doc.length())){ // Vérification qu'il reste sufisament de place dans le fichier cible
+        if(MAX_SIZE > (Size + doc.length())){ // Vérification qu'il reste suffisament de place dans le fichier cible
           break;
         }
         j++;
@@ -724,7 +727,7 @@ void Envoie(){
 
     chemin += (horloge.toString("/YYMMDD_"));
     chemin += (j);
-    chemin += (".LOG"); // Recreation du chemin jusqu'au fichier cible pour pouvoir ouvrir le bon fichier
+    chemin += (".LOG"); // Recréation du chemin jusqu'au fichier cible pour pouvoir ouvrir le bon fichier
 
     file = SD.open(chemin, FILE_WRITE);
     file.print(doc);
@@ -747,14 +750,15 @@ void setup(){
   GPS_serial.begin(9600); // Ouverture de la connection avec le GPS
   beginRTC(); // Ouverture de la connection avec l'horloge (fonction de la bibliotèques RTC modifié)
 
-  setup_EEPROM(); // Connection à l'EEPROM (et reset si nessessaire)
-  setup_Interruption(); // Connection aux timers et aux interruptions
+  setup_EEPROM(); // Ouverture de la connection à l'EEPROM (et reset si nessessaire)
+  setup_Interruption(); // Ouverture de la connection aux timers et aux interruptions
 
-  if(digitalRead(2) == LOW){
+  if(digitalRead(2) == LOW){ // Vérification que le bouton rouge est pressé lors du démarage pour entré dans le mode Configuration
     unsigned long temps = millis;
-    while(millis()-temps < 1800000){
+
+    while(millis()-temps < 1800000){ // La boucle while sera bloqué durant 30 min
       setColorRGB(255, 128, 0);
-      //Configuration();
+      Configuration();
     }
   }
 }
@@ -762,7 +766,8 @@ void setup(){
 
 
 void loop(){
- horloge = nowRTC();
+  // Aquisition ****************************************************************
+  horloge = nowRTC(); // Aquisition de la date et l'heure
 
   if(!Mode_eco){
     Lecture_GPS();
@@ -774,20 +779,19 @@ void loop(){
     Capteur_GPS.GPS_eco = !(Capteur_GPS.GPS_eco);
   }
 
-  Lecture_Capteur();
+  Lecture_Capteur(); // Aquisition des données
 
-  // Traitement
+  // Traitement ****************************************************************
   File_temps_first();
-  Gestion_erreur();
+  Gestion_erreur(); // Vérification des erreurs
 
-  // Envoie
-  Envoie();
+  // Envoie ********************************************************************
+  Envoie(); // Envoie des données
 
-  // Boucle de gestion du temps
-
+  // Delay *********************************************************************
   unsigned long tempsPrecedent = millis();
 
   while(millis()-tempsPrecedent < (unsigned long)(60*1000*LOGINTERVAL*(1+(byte)Mode_eco))){
-    // le code se bloquera dans cette boucle while pendant la duree LOGINTERVALL
+    // le code se bloquera dans cette boucle while pendant la duree LOGINTERVALL (de base 10 min) et ensuite reprendra la boucle loop ensuite
   }
 }
