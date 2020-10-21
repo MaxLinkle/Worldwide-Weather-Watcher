@@ -51,6 +51,8 @@ GPS Capteur_GPS;
 // Déclation des diversses variables globales
 SoftwareSerial GPS_serial(4,5);
 
+DateTime horloge;
+
 boolean Mode_eco = false;
 
   // variables globales utilisées par les interruptions mise en "volatile" par mesure de sécurité
