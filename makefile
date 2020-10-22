@@ -4,7 +4,8 @@ df_cpu=16000000
 mmcu=atmega328p
 com=/dev/ttyACM1
 
-Arduino_lib=/usr/share/arduino/hardware/arduino/cores/arduino
+#Arduino_lib=/usr/share/arduino/hardware/arduino/cores/arduino
+Arduino_lib=libraries
 Arduino_pin=/usr/share/arduino/hardware/arduino/variants/standard
 
 N_fichier=main
