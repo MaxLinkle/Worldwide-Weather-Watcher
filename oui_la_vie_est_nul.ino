@@ -121,19 +121,21 @@ void setColorRGB(byte red, byte green, byte blue){
 // ################################################################################################################################
 
 // EEPROM -------------------------------------------------------------------------------------------------------------------------
+
+// Découpe du message envoyé dans le moniteur série
 void Message(String* message){
   String decoupe="";
   byte adresse=-1;
   for(int i=0; i<(*message).length(); i++) {
     decoupe += (*(message))[i];
     if((*(message))[i] == '='){
-        Trouver(&adresse,decoupe);
+        Trouver(&adresse,decoupe); // Recherche de l'adresse où est stockée la valeur de la commande demandée dans l'EEPROM
         decoupe = "";
 
     }
  }
   switch (adresse){
-    case -2:
+    case -2: // Si la commande est "CLOCK"
         if (isDigit(decoupe[0]) && isDigit(decoupe[1]) && isDigit(decoupe[3]) && isDigit(decoupe[4]) && isDigit(decoupe[6]) && isDigit(decoupe[7])){
           char hour[2] = {decoupe[0], decoupe[1]};
           char minute[2] = {decoupe[3], decoupe[4]};
@@ -141,7 +143,7 @@ void Message(String* message){
           adjust(DateTime((nowRTC()).year(), (nowRTC()).month(), (nowRTC()).day(), (atoi(hour)), atoi(minute), atoi(second)));
         }
       break;
-    case -3:
+    case -3: // Si la commande est "DATE"
         if (isDigit(decoupe[0]) && isDigit(decoupe[1]) && isDigit(decoupe[3]) && isDigit(decoupe[4]) && isDigit(decoupe[6]) && isDigit(decoupe[7]) && isDigit(decoupe[8]) && isDigit(decoupe[9])){
           char day[2] = {decoupe[0], decoupe[1]};
           char month[2] = {decoupe[3], decoupe[4]};
@@ -149,13 +151,13 @@ void Message(String* message){
           adjust(DateTime(atoi(year), atoi(month), atoi(day), (nowRTC()).hour(), (nowRTC()).minute(), (nowRTC()).second()));
         }
       break;
-    default:
+    default: // Pour les autres commandes : Enregistrement de la valeur dans l'EEPROM a l'adresse recherchée plus tôt
       EEPROM.put(adresse, int(decoupe.toInt()));
   }
 }
 
 
-
+// Fonction pour mettre les valeurs par défaut dans l'EEPROM
 void reset(){
   EEPROM.write(0, 1);
   EEPROM.write(1, 10);
@@ -176,7 +178,7 @@ void reset(){
 }
 
 
-
+// Fonction pour trouver l'adresse de la valeur pour la commande rentrée dans le moniteur série
 void Trouver(byte* adresse,String decoupe){
 
   if (decoupe == "CLOCK="){
@@ -249,7 +251,7 @@ void Trouver(byte* adresse,String decoupe){
 }
 
 
-
+// Fonction d'analyse du message rentré dans le moniteur série
 void Configuration(){
   String message="";
   int t;
@@ -260,12 +262,15 @@ void Configuration(){
     message += char(Serial.read());
     delayMicroseconds(2000);
   }
-  if (message == "RESET"){
+  if (message == "RESET") // Si la commande est "RESET"
+  {
     reset();
   }
-  else if (message == "VERSION"){
+  else if (message == "VERSION") // Si la commande est "VERSION"
+  {
     Serial.println("1.0");
-  }else{
+  }else // Si c'est un tout autre message
+  {
     Message(&message);
   }
 }
@@ -419,7 +424,7 @@ void setup_EEPROM(){
 
 // ################################################################################################################################
 
-// AQUISITION ---------------------------------------------------------------------------------------------------------------------
+// AcQUISITION --------------------------------------------------------------------------------------------------------------------
 void Lecture_GPS() {
   String ordre = "";
   boolean Analyse = false;
@@ -769,7 +774,7 @@ void setup(){
 
 void loop(){
   // Aquisition ****************************************************************
-  horloge = nowRTC(); // Aquisition de la date et l'heure
+  horloge = nowRTC(); // Acquisition de la date et l'heure
 
   if(!Mode_eco){
     Lecture_GPS();
@@ -781,11 +786,11 @@ void loop(){
     Capteur_GPS.GPS_eco = !(Capteur_GPS.GPS_eco);
   }
 
-  Lecture_Capteur(); // Aquisition des données
+  Lecture_Capteur(); // Acquisition des données
 
   // Traitement ****************************************************************
-  File_temps_first();
-  Gestion_erreur(); // Vérification des erreurs
+  File_temps_first(); // Vérification des erreurs d'horloge
+  Gestion_erreur(); // Vérification des erreurs de capteur ou de GPS
 
   // Envoie ********************************************************************
   Envoie(); // Envoie des données
