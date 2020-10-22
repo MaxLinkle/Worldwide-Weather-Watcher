@@ -55,10 +55,10 @@ link: compilation_obj archivage
 
 compilation: link
 	@avr-objcopy -O ihex -R .eeprom $(chemin)/file/$(N_fichier).elf $(chemin)/file/$(N_fichier).hex
+	@avr-size -C $(chemin)/file/$(N_fichier).elf
 	@echo "compilation terminé"
 
 televersement: compilation
-	@avr-size -C $(chemin)/file/$(N_fichier).elf
 	@avrdude -p $(mmcu) -c arduino -P $(com) -b115200 -U flash:w:$(chemin)/file/$(N_fichier).hex
 
 #verif_size: compilation
