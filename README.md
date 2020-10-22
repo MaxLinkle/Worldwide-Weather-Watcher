@@ -7,7 +7,7 @@
 Pour pouvoir téléverser le code sur la carte arduino il vous faudra utiliser le makefile mis a votre disposition.
 Pour cela dirigé vous dans le bon dossier puis exécuté dans votre inviter de comamnde la commande : `make chemin=$(pwd) televersement`  
 
-__/!\ Attention__ N'oubliez pas de bien mettre votre arduino sur le bon port. Si ce n'est pas le cas utiliser la commande `make chemin=$(pwd) com=X televersement` avec X qui correspondra a votre nouveau port.
+__/!\ Attention__ N'oubliez pas de bien mettre votre arduino sur le bon port. Si ce n'est pas le cas utiliser la commande `make chemin=$(pwd) com=X televersement` avec X qui correspondra à votre nouveau port.
 
 ## libraries
 
