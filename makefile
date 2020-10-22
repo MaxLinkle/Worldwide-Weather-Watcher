@@ -6,7 +6,8 @@ com=/dev/ttyACM1
 
 #Arduino_lib=/usr/share/arduino/hardware/arduino/cores/arduino
 Arduino_lib=libraries
-Arduino_pin=/usr/share/arduino/hardware/arduino/variants/standard
+#Arduino_pin=/usr/share/arduino/hardware/arduino/variants/standard
+Arduino_pin=pin
 
 N_fichier=main
 chemin=$(pwd)
