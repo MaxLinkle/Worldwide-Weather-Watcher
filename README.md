@@ -18,7 +18,7 @@ Celle ci seront directement appelé par notre makefile.
 
 ## pin
 
-Dans le dossier [](https://github.com/MaxLinkle/Worldwide-Weather-Watcher/tree/master/libraries "*pin*") nous avons placer la librairie qui permet de dire à l'arduino qu'elle pin il possède.  
+Dans le dossier *pin* nous avons placer la librairie qui permet de dire à l'arduino qu'elle pin il possède.  
 Cette librairie est également appelé directement dans le makefile.
 
 ## main.ino
