@@ -18,3 +18,8 @@ Celle ci seront directement appelé par notre makefile.
 
 Dans le dossier *pin* nous avons placer la librairie qui permet de dire à l'arduino qu'elle pin il possède.  
 Cette librairie est également appelé directement dans le makefile.
+
+## main.ino
+
+Il s'agit du code principal. 
+Pour
