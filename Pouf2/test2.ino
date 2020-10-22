@@ -426,7 +426,7 @@ void Lecture_GPS() {
   byte i = 0;
   unsigned long tempscapture = millis();
 
-  while(!fin && millis()-tempscapture < TIMEOUT){
+  while(!fin && millis()-tempscapture < TIMEOUT *1000){
     while(GPS_serial.available()){
       char Temp = char(GPS_serial.read());
 
