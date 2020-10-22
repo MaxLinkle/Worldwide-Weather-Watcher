@@ -1,11 +1,11 @@
-all: compilation
+all: televersement
 
 df_cpu=16000000
 mmcu=atmega328p
 com=/dev/ttyACM1
 
-Arduino_lib=/usr/share/arduino/hardware/arduino/cores/arduino
-Arduino_pin=/usr/share/arduino/hardware/arduino/variants/standard
+Arduino_lib=libraries
+Arduino_pin=pin
 
 N_fichier=main
 chemin=$(pwd)
@@ -24,11 +24,7 @@ Obj_cpp:=$(Obj_cpp:%.cpp=%.o)
 
 clean:
 	@rm -Rf $(chemin)/file
-	@mkdir -p $(chemin)/file/lib/avr-libc
-
-#init: clean
-#@mkdir -p $(chemin)/file/lib/avr-libc
-#@cp ./init/Blink.ino $(chemin)
+	@mkdir -p $(chemin)/file/lib/utility
 
 inject_cpp: clean
 	@echo '#include "Arduino.h"' > $(chemin)/file/$(N_fichier).cpp
@@ -53,10 +49,9 @@ link: compilation_obj archivage
 
 compilation: link
 	@avr-objcopy -O ihex -R .eeprom $(chemin)/file/$(N_fichier).elf $(chemin)/file/$(N_fichier).hex
+	@avr-size -C $(chemin)/file/$(N_fichier).elf
 	@echo "compilation terminé"
 
 televersement: compilation
 	@avrdude -p $(mmcu) -c arduino -P $(com) -b115200 -U flash:w:$(chemin)/file/$(N_fichier).hex
 
-verif_size: compilation
-	@avr-size $(chemin)/file/$(N_fichier).elf
