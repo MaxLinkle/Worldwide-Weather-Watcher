@@ -6,11 +6,15 @@
 
 Pour pouvoir téléverser le code sur la carte arduino il vous faudra utiliser le makefile mis a votre disposition.
 Pour cela dirigé vous dans le bon dossier puis exécuté dans votre inviter de comamnde la commande : `make chemin=$(pwd) televersement`  
+
 __/!\ Attention__ N'oubliez pas de bien mettre votre arduino sur le bon port. Si ce n'est pas le cas utiliser la commande `make chemin=$(pwd) com=X televersement` avec X qui correspondra a votre nouveau port.
 
 ## libraries
 
-Dans le dossire libraries nous avons placer les bibliothèques de bases et celles que nous avons modifié afin de gagner en espace.
-Nous avons crée un dossier libreries où nous avons placer les bibliothèques de bases et celles que nous avons modifié afin de gagner en espace.
-Vous y retrouver notamment la bibliothèque des Pins qui sert à déterminer sur quels arduino nous sommes et quel pins nous utilisons.
+Dans le dossier *libraries* nous avons placer les bibliothèques de bases et celles que nous avons modifié afin de gagner en espace.  
+Celle ci seront directement appelé par notre makefile.
 
+## pin
+
+Dans le dossier *pin* nous avons placer la librairie qui permet de dire à l'arduino qu'elle pin il possède.  
+Cette librairie est également appelé directement dans le makefile.
