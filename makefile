@@ -1,12 +1,10 @@
-all: compilation
+all: televersement
 
 df_cpu=16000000
 mmcu=atmega328p
 com=/dev/ttyACM1
 
-#Arduino_lib=/usr/share/arduino/hardware/arduino/cores/arduino
 Arduino_lib=libraries
-#Arduino_pin=/usr/share/arduino/hardware/arduino/variants/standard
 Arduino_pin=pin
 
 N_fichier=main
@@ -27,10 +25,6 @@ Obj_cpp:=$(Obj_cpp:%.cpp=%.o)
 clean:
 	@rm -Rf $(chemin)/file
 	@mkdir -p $(chemin)/file/lib/utility
-
-#init: clean
-#@mkdir -p $(chemin)/file/lib/avr-libc
-#@cp ./init/Blink.ino $(chemin)
 
 inject_cpp: clean
 	@echo '#include "Arduino.h"' > $(chemin)/file/$(N_fichier).cpp
@@ -61,5 +55,3 @@ compilation: link
 televersement: compilation
 	@avrdude -p $(mmcu) -c arduino -P $(com) -b115200 -U flash:w:$(chemin)/file/$(N_fichier).hex
 
-#verif_size: compilation
-#	@avr-size $(chemin)/file/$(N_fichier).elf
