@@ -1,5 +1,7 @@
 # Worldwide-Weather-Watcher
 
+![](https://github.com/MaxLinkle/Worldwide-Weather-Watcher/blob/master/carte.jpg)
+
 ### Projet Système Embarqué : CPI A2 Groupe 1 (Maxime, Ray-hann, Catarina, Antoine)
 
 ## Makefile
