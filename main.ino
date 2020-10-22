@@ -394,8 +394,8 @@ void setup_Interruption(){
   // bouton sur les pins 2 et 3
   pinMode(2,INPUT);
   pinMode(3,INPUT);
-  attachInterrupt(digitalPinToInterrupt(2),Interruption,CHANGE);
-  attachInterrupt(digitalPinToInterrupt(3),Interruption,CHANGE);
+  attachInterrupt(0,Interruption,CHANGE);
+  attachInterrupt(1,Interruption,CHANGE);
   cli();
   bitClear (TCCR2A, WGM20);
   bitClear (TCCR2A, WGM21);
