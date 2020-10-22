@@ -1,6 +1,6 @@
 # Worldwide-Weather-Watcher
 
-### Projet Système Embarqué : CPI A2 Groupe 1
+### Projet Système Embarqué : CPI A2 Groupe 1 (Maxime, Ray-hann, Catarina, Antoine)
 
 ## Makefile
 
