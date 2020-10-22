@@ -26,7 +26,7 @@ Obj_cpp:=$(Obj_cpp:%.cpp=%.o)
 
 clean:
 	@rm -Rf $(chemin)/file
-	@mkdir -p $(chemin)/file/lib/avr-libc
+	@mkdir -p $(chemin)/file/lib/utility
 
 #init: clean
 #@mkdir -p $(chemin)/file/lib/avr-libc
