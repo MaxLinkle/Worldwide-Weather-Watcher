@@ -13,12 +13,12 @@ Pour cela dirigé vous dans le bon dossier puis exécuté dans votre inviter de 
 
 ## libraries
 
-Dans le dossier *libraries* nous avons placer les bibliothèques de bases et celles que nous avons modifié afin de gagner en espace.  
+Dans le dossier ***libraries*** nous avons placer les bibliothèques de bases et celles que nous avons modifié afin de gagner en espace.  
 Celle ci seront directement appelé par notre makefile.
 
 ## pin
 
-Dans le dossier *pin* nous avons placer la librairie qui permet de dire à l'arduino qu'elle pin il possède.  
+Dans le dossier ***pin*** nous avons placer la librairie qui permet de dire à l'arduino qu'elle pin il possède.  
 Cette librairie est également appelé directement dans le makefile.
 
 ## main.ino
