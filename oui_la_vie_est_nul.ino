@@ -424,7 +424,7 @@ void setup_EEPROM(){
 
 // ################################################################################################################################
 
-// AQUISITION ---------------------------------------------------------------------------------------------------------------------
+// AcQUISITION --------------------------------------------------------------------------------------------------------------------
 void Lecture_GPS() {
   String ordre = "";
   boolean Analyse = false;
@@ -774,7 +774,7 @@ void setup(){
 
 void loop(){
   // Aquisition ****************************************************************
-  horloge = nowRTC(); // Aquisition de la date et l'heure
+  horloge = nowRTC(); // Acquisition de la date et l'heure
 
   if(!Mode_eco){
     Lecture_GPS();
@@ -786,11 +786,11 @@ void loop(){
     Capteur_GPS.GPS_eco = !(Capteur_GPS.GPS_eco);
   }
 
-  Lecture_Capteur(); // Aquisition des données
+  Lecture_Capteur(); // Acquisition des données
 
   // Traitement ****************************************************************
-  File_temps_first();
-  Gestion_erreur(); // Vérification des erreurs
+  File_temps_first(); // Vérification des erreurs d'horloge
+  Gestion_erreur(); // Vérification des erreurs de capteur ou de GPS
 
   // Envoie ********************************************************************
   Envoie(); // Envoie des données
