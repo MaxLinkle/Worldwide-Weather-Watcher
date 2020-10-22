@@ -58,7 +58,7 @@ compilation: link
 	@echo "compilation terminé"
 
 televersement: compilation
-	@avr-size $(chemin)/file/$(N_fichier).elf
+	@avr-size -C $(chemin)/file/$(N_fichier).elf
 	@avrdude -p $(mmcu) -c arduino -P $(com) -b115200 -U flash:w:$(chemin)/file/$(N_fichier).hex
 
 #verif_size: compilation
