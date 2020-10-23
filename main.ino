@@ -277,12 +277,12 @@ void Changement_LED(){
 
 
 void Interruption(){
-  if(!digitalRead(2) || !digitalRead(3)){
+  if(!digitalRead(2) || !digitalRead(3)){ // Si boutons appuyer on active le timer de 5 secondes
     TIMSK1 = 0b00000010;
 
   }
   else{
-    if(digitalRead(2) && digitalRead(3)){
+    if(digitalRead(2) && digitalRead(3)){// Si boutons lacher reinitialiser timer de 5 secondes
       TIMSK1 = 0b00000000;
       varCompteur2 = 0;
 
@@ -294,7 +294,7 @@ void Interruption(){
 
 ISR(TIMER2_OVF_vect){
   TCNT2 = 256 - 125;
-  if(varCompteur1++ > 125){
+  if(varCompteur1++ > 125){//Timers pour le clignotement de la led en cas d'erreurs
     varCompteur1 = 0;
   }
   Changement_LED();
@@ -302,22 +302,22 @@ ISR(TIMER2_OVF_vect){
 
 ISR(TIMER1_COMPA_vect){
   if(varCompteur2<5){
-    varCompteur2++;
+    varCompteur2++; //Compte des secondes de pression des boutons 
   }
   else if(varCompteur2 == 5){
      varCompteur2++;
     /*if(digitalRead(2)== LOW && digitalRead(3)==LOW){
-
+//Decommenter pour 2 bouton 
     }
     else */if(digitalRead(2)== LOW){
-      boutonR = !boutonR;
+      boutonR = !boutonR; // Pour determiner si on rentre ou sors de la maintenance
       interrupts();
-      TIMSK2 = 0b00000000;
+      TIMSK2 = 0b00000000;//Desactivation clignotements Led
       while (boutonR){
       // fonction de  Maintenance()
       setColorRGB(230, 105, 0);
     }
-    TIMSK2 = 0b00000001;
+    TIMSK2 = 0b00000001;//Reactivation Led
     }
     else{
       Mode_eco = !(Mode_eco);
@@ -339,7 +339,7 @@ void setup_Interruption(){
   bitClear (TCCR2A, WGM20);
   bitClear (TCCR2A, WGM21);
   bitClear (TCCR1A, WGM10);
-  bitClear (TCCR1A, WGM11);
+  bitClear (TCCR1A, WGM11);  //Initialisation de tout les registres d'interruption.
   TCCR2B = 0b00000111;
   TIMSK2 = 0b00000001;
   TCCR1B = 0b00001101;
