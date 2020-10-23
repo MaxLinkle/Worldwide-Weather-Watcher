@@ -709,48 +709,40 @@ void setup(){
     }
   }
   setup_Interruption();
-
-
 }
 
-void loop(){
-  unsigned long tempsPrecedent = millis();
 
- horloge = (nowRTC());
+
+void loop(){
+  // Acquisition ****************************************************************
+  unsigned long tempsPrecedent = millis();
+  
+  horloge = (nowRTC()); // Acquisition de la date et l'heure
 
   if(!Mode_eco){
     Lecture_GPS();
-  } else{
+  } 
+  else{
     if(!Capteur_GPS.GPS_eco){
       Lecture_GPS();
     }
     Capteur_GPS.GPS_eco = !(Capteur_GPS.GPS_eco);
   }
 
-//Capteur_GPS.Valide = false;
+  Lecture_Capteur(); // Acquisition des données 
 
-
-  Lecture_luminosite();
-  Lecture_TPH();
-  // Traitement
+  // Traitement ****************************************************************
+  File_temps_first(); // Vérification des erreurs d'horloge
+  Gestion_erreur(); // Vérification des erreurs de capteur ou de GPS
   
-  File_temps_first();
-
+  // Envoie ********************************************************************
+  TIMSK2 = 0b00000000;
+  Envoie(); // Envoie des données
+  TIMSK2 = 0b00000001;
+  SD.end();
   
-  Gestion_erreur();
-  // Envoie
-TIMSK2 = 0b00000000;
-  Envoie();
-TIMSK2 = 0b00000001;
-  // Boucle de gestion du temps
-
-SD.end();
-
-  
-while(millis()-tempsPrecedent < 10000*(1+(byte)Mode_eco)){
-
-
-}
-
- 
+  // Delay *********************************************************************
+  while(millis()-tempsPrecedent < 10000*(1+(byte)Mode_eco)){
+    // le code se bloquera dans cette boucle while pendant la duree LOGINTERVALL (de base 10 min) et ensuite reprendra la boucle loop ensuite
+  } 
 }
