@@ -331,8 +331,8 @@ ISR(TIMER1_COMPA_vect){
 // INITIALISATION -----------------------------------------------------------------------------------------------------------------
 void setup_Interruption(){
   // bouton sur les pins 2 et 3
-  pinMode(2,INPUT);
-  pinMode(3,INPUT);
+  pinMode(0,INPUT);
+  pinMode(1,INPUT);
   attachInterrupt(0,Interruption,CHANGE);
   attachInterrupt(1,Interruption,CHANGE);
   cli();
@@ -452,49 +452,34 @@ void Lecture_Capteur(){
 // TRAITEMENT ---------------------------------------------------------------------------------------------------------------------
 void Gestion_erreur(){
 
-boolean Tab1 = false;
-boolean Tab2 = false;
+  boolean Tab1 = false;
 
- int Test = (Capteur_L_TPH[0]).Valeur;
-  if(Capteur_L_TPH[1].Erreur){ // Temperature de l'air
-    Tab2 = true;
-  } else if(Capteur_L_TPH[1].Valeur < MIN_TEMP_AIR || Capteur_L_TPH[1].Valeur > MAX_TEMP_AIR){
+  int Test = (Capteur_L_TPH[0]).Valeur;
+
+  if(Capteur_L_TPH[1].Valeur < MIN_TEMP_AIR || Capteur_L_TPH[1].Valeur > MAX_TEMP_AIR){ // Vérification que la température de l'air soit dans ses limites
     Tab1 = true;
   }
 
+  if(!Capteur_L_TPH[2].Erreur){ // Vérification de l'erreur de la pression
+    Tab_refus[6] = (Capteur_L_TPH[2].Valeur < PRESSURE_MIN_ALARME || Capteur_L_TPH[2].Valeur > PRESSURE_MAX_ALARME);
 
-
-  
-  if(Capteur_L_TPH[2].Erreur){ // Pression
-    Tab2 = true;
-  } else{
-    if(Capteur_L_TPH[2].Valeur < PRESSURE_MIN || Capteur_L_TPH[2].Valeur > PRESSURE_MAX){
+    if(Capteur_L_TPH[2].Valeur < PRESSURE_MIN || Capteur_L_TPH[2].Valeur > PRESSURE_MAX){ // Vérification que la pression soit dans ses limites
       Tab1 = true;
     }
-
-
-      Tab_refus[6] = (Capteur_L_TPH[2].Valeur < PRESSURE_MIN_ALARME || Capteur_L_TPH[2].Valeur > PRESSURE_MAX_ALARME);
-    
   }
 
-  if(Capteur_L_TPH[3].Erreur){ // Hygrometrie
-    Tab2 = true;
-  }
-
-
-
-    Tab_refus[3] = !(Capteur_GPS).Valide;
-  
-
+  Tab_refus[3] = !(Capteur_GPS).Valide;
   Tab_refus[1] = Tab1;
-  Tab_refus[2] = Tab2;
 
   (Capteur_L_TPH[0]).Valeur = Test;
 }
 
-void PrintDirectory_temps(File dir,String date){
+
+
+void PrintDirectory_temps(File dir,char date[]){
   while (true) {
     File entry =  dir.openNextFile();
+
     if (! entry) {
       // no more files
       break;
@@ -502,12 +487,14 @@ void PrintDirectory_temps(File dir,String date){
 
     if(entry.isDirectory()){
       PrintDirectory_temps(entry, date);
-    } else if(String(entry.name()).endsWith(".LOG")){
+    }
+    else if(String(entry.name()).endsWith(".LOG")){
 
       for(int i = 0;i<6;i++){
         if(date[i]>(entry.name())[i]){
           i= 7;
-        } else if(date[i]<(entry.name())[i]){
+        }
+        else if(date[i]<(entry.name())[i]){
           Tab_refus[5]=true;
           break;
         }
@@ -517,16 +504,15 @@ void PrintDirectory_temps(File dir,String date){
   }
 }
 
+
+
 void File_temps_first(){
   if(isrunning()){
-    if(!SD.begin()){
     File root = SD.open("/");
-    PrintDirectory_temps(root, (horloge).toString("AAMMDD"));
+    PrintDirectory_temps(root, (nowRTC()).toString("AAMMDD"));
     root.close();
-    }else{
-      Tab_refus[4]=true;
-      }
-  }else{
+  }
+  else{
     Tab_refus[5]=true;
   }
 }
@@ -686,22 +672,20 @@ Tab_refus[4] = false;
 
 
 void setup(){
-  Serial.begin(38400);
-  GPS_serial.begin(9600);
-  (beginRTC());
+  Serial.begin(38400); // Ouverture du port serial
+  GPS_serial.begin(9600); //  Ouverture de la connection GPS
+  (beginRTC()); // Ouverture de la connection avec l'horloge (fonction de la bibliotèques RTC modifié)
   
 
-  //setup_EEPROM();
+  setup_EEPROM();
 
-if(digitalRead(2) == LOW){
-
-
-  unsigned long temps = millis();
-  while(millis()-temps < 1800000){
-    setColorRGB(255, 128, 0);
-   //Configuration();
+  if(digitalRead(2) == LOW){
+    unsigned long temps = millis();
+    while(millis()-temps < 1800000){
+     setColorRGB(255, 128, 0);
+     //Configuration();
+    }
   }
-}
   setup_Interruption();
 
 
