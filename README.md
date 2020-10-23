@@ -11,7 +11,7 @@ Pour cela dirigé vous dans le bon dossier puis exécuté dans votre inviter de 
 
 Vous pouvez aussi si vous le désirer uniquement compiler votre fichier sans avoir à le téléverser, pour cela il vous suffit d'exécuter la commade : `make chemin=$(pwd) compilation`  
 
-Lors que vous compilerez le fichier en utilisant le ***makefile*** vous optientdrez une fichier **.hex**. Malheuresement notre ***makefile*** est moins optimiser que l'IDE d'Arduino et le fichier que vous obtiendrai ne probablement pas etre téléverser dans l'etat à cause de la mémoire programme qui risque d'être trop élevé (<32256 octets). N'hésité donc pas à utiliser l'IDE d'arduino pour votre téléversement.
+Lors que vous compilerez le fichier en utilisant le ***makefile*** vous optientdrez une fichier **.hex**. Malheuresement notre ***makefile*** est moins optimiser que l'IDE d'Arduino et le fichier que vous obtiendrai ne probablement pas etre téléverser dans l'etat à cause de la mémoire programme qui risque d'être trop élevé (<32256 octets). N'hésité donc pas à utiliser l'IDE d'arduino pour votre téléversement. Cela ne veut pas pour autant dire que notre ***makefile*** ne fonctionne pas, et vous pourrais toujours tester la compilation pour voire qu'il vous créera les bons fichiers. Mais si vous deviez passer par l'IDE, penser bien à remplacer vos librairies avec les notres.
 
 **/!\ Attention** : N'oubliez pas de bien mettre votre arduino sur le bon port. Si ce n'est pas le cas utiliser la commande `make chemin=$(pwd) com=X` avec X qui correspondra à votre nouveau port.
 
