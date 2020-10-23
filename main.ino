@@ -2,15 +2,14 @@
 #include <SPI.h>
 #include <SD.h>
 #include <RTClib.h>
-#include <Wire.h>
+#include <Led.h>
+//#include <Wire.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_BME280.h>
 
-#define chipSelect 4
 #define Nb_capteur 4
 #define PRESSURE_MIN_ALARME 850
 #define PRESSURE_MAX_ALARME 1080
-
 
 //EEPROM.get(0, 1);
 typedef struct Capteur Capteur;
@@ -67,56 +66,7 @@ volatile boolean boutonR = false;
 
 // BIBLIOTEQUE --------------------------------------------------------------------------------------------------------------------
   // ChainableLED
-void sendByte(byte b){
-    // Send one bit at a time, starting with the MSB
-    for (byte i=0; i<8; i++)
-    {
-      pinMode(6,OUTPUT);
-      pinMode(5,OUTPUT);
-        // If MSB is 1, write one and clock it, else write 0 and clock
-        if ((b & 0x80) != 0)
-            digitalWrite(6, HIGH);
-        else
-            digitalWrite(6, LOW);
 
-    digitalWrite(5, LOW);
-    delayMicroseconds(20);
-    digitalWrite(5, HIGH);
-    delayMicroseconds(20);
-
-        // Advance to the next bit to send
-        b <<= 1;
-    }
-}
-
-void setColorRGB(byte red, byte green, byte blue){
-    // Send data frame prefix (32x "0")
-    sendByte(0x00);
-    sendByte(0x00);
-    sendByte(0x00);
-    sendByte(0x00);
-
-        // Start by sending a byte with the format "1 1 /B7 /B6 /G7 /G6 /R7 /R6"
-    byte prefix = 0b11000000;
-    if ((blue & 0x80) == 0)     prefix|= 0b00100000;
-    if ((blue & 0x40) == 0)     prefix|= 0b00010000;
-    if ((green & 0x80) == 0)    prefix|= 0b00001000;
-    if ((green & 0x40) == 0)    prefix|= 0b00000100;
-    if ((red & 0x80) == 0)      prefix|= 0b00000010;
-    if ((red & 0x40) == 0)      prefix|= 0b00000001;
-    sendByte(prefix);
-
-    // Now must send the 3 colors
-    sendByte(blue);
-    sendByte(green);
-    sendByte(red);
-
-    // Terminate data frame (32x "0")
-    sendByte(0x00);
-    sendByte(0x00);
-    sendByte(0x00);
-    sendByte(0x00);
-}
 
 
 
@@ -225,21 +175,16 @@ void Message(String* message){
        
     }
  }
+ DateTime tempo = nowRTC();
   switch (adresse){
     case -2:
         if (isDigit(decoupe[0]) && isDigit(decoupe[1]) && isDigit(decoupe[3]) && isDigit(decoupe[4]) && isDigit(decoupe[6]) && isDigit(decoupe[7])){
-          char hour[2] = {decoupe[0], decoupe[1]};
-          char minute[2] = {decoupe[3], decoupe[4]};
-          char second[2] = {decoupe[6], decoupe[7]};
-          adjust(DateTime(((nowRTC())).year(), ((nowRTC())).month(), ((nowRTC())).day(), (atoi(hour)), atoi(minute), atoi(second)));
+          adjust(DateTime(tempo.year(), tempo.month(), tempo.day(), 10*(decoupe[0]-'0')+(decoupe[1]-'0'), 10*(decoupe[3]-'0')+(decoupe[4]-'0'), 10*(decoupe[6]-'0')+(decoupe[7]-'0')));
         }
       break;
     case -3:
         if (isDigit(decoupe[0]) && isDigit(decoupe[1]) && isDigit(decoupe[3]) && isDigit(decoupe[4]) && isDigit(decoupe[6]) && isDigit(decoupe[7]) && isDigit(decoupe[8]) && isDigit(decoupe[9])){
-          char day[2] = {decoupe[0], decoupe[1]};
-          char month[2] = {decoupe[3], decoupe[4]};
-          char year[4] = {decoupe[6], decoupe[7], decoupe[8], decoupe[9]};
-          adjust(DateTime(atoi(year), atoi(month), atoi(day), ((nowRTC())).hour(), ((nowRTC())).minute(), ((nowRTC())).second()));
+          adjust(DateTime(  1000*(decoupe[6]-'0')+100*(decoupe[7]-'0')+10*(decoupe[8]-'0')+(decoupe[9]-'0')  , 10*(decoupe[3]-'0')+(decoupe[4]-'0'), 10*(decoupe[0]-'0')+(decoupe[1]-'0') , tempo.hour(), tempo.minute(), tempo.second()));
         }
       break;
     default:
@@ -277,7 +222,6 @@ void Changement_LED(){
   if (Tab_refus[6]){ // Tempete
     setColorRGB(255, 0, 0);
 
-
   }
   else if (Tab_refus[5]){ // Erreur horloge
     if (varCompteur1 < 63){
@@ -299,8 +243,10 @@ void Changement_LED(){
   else if (Tab_refus[3]){ // Erreur de GPS
     if (varCompteur1 < 63){
       setColorRGB(255, 0, 0);
+      
     } else{
-      setColorRGB(220,0,200) ;   //(255, 255, 0);
+      setColorRGB(255, 255, 0);
+      //Serial.println(debug);
     }
 
   }
@@ -363,10 +309,10 @@ ISR(TIMER1_COMPA_vect){
   }
   else if(varCompteur2 == 5){
      varCompteur2++;
-    if(digitalRead(2)== LOW && digitalRead(3)==LOW){
+    /*if(digitalRead(2)== LOW && digitalRead(3)==LOW){
 
     }
-    else if(digitalRead(2)== LOW){
+    else */if(digitalRead(2)== LOW){
       boutonR = !boutonR;
       interrupts();
       TIMSK2 = 0b00000000;
@@ -426,7 +372,7 @@ void Lecture_GPS() {
   byte i = 0;
   unsigned long tempscapture = millis();
 
-  while(!fin && millis()-tempscapture < TIMEOUT *1000){
+  while(!fin && millis()-tempscapture < TIMEOUT){
     while(GPS_serial.available()){
       char Temp = char(GPS_serial.read());
 
@@ -557,7 +503,7 @@ boolean Tab2 = false;
   (Capteur_L_TPH[0]).Valeur = Test;
 }
 
-void PrintDirectory_temps(File dir,char date[]){
+void PrintDirectory_temps(File dir,String date){
   while (true) {
     File entry =  dir.openNextFile();
     if (! entry) {
@@ -584,9 +530,13 @@ void PrintDirectory_temps(File dir,char date[]){
 
 void File_temps_first(){
   if(isrunning()){
+    if(!SD.begin()){
     File root = SD.open("/");
-    PrintDirectory_temps(root, ((nowRTC())).toString("AAMMDD"));
+    PrintDirectory_temps(root, (horloge).toString("AAMMDD"));
     root.close();
+    }else{
+      Tab_refus[4]=true;
+      }
   }else{
     Tab_refus[5]=true;
   }
@@ -596,15 +546,14 @@ void File_temps_first(){
 
 // ENVOIE -------------------------------------------------------------------------------------------------------------------------
 void Envoie(){
-
   if(!SD.begin()){
     Tab_refus[4] = true;
     return;
   }
+
 Tab_refus[4] = false;
   // ---------------------------------------------------------------------------
   String doc = "";
-
   // Horloge
   doc += (horloge.toString("YY/MM/DD hh:mm:ss"));
 
@@ -659,73 +608,83 @@ Tab_refus[4] = false;
   doc += ("g/m3");
   doc += '\n';
   // ---------------------------------------------------------------------------
-
   File file;
   unsigned long Size;
   // unsigned long Size_card = (512*SdVolume.blocksPerCluster() * SdVolume.clusterCount());
-
+  
   File root = SD.open("/");
   Size = SD.Taille_carte() - root.size();
   root.close();
 
   String chemin = "";
 
-  int j = 0;
-  int i = 0;
 
   if(Size >= doc.length()){
     Tab_refus[0] = false;
-
-    if(SD.exists(horloge.toString("YYMMDD"))){
+      int j = 0;
+      int i = 0;
+    if(SD.exists(horloge.toString("YYMMDD"))){   
       while(1){
-
         if(j > 9){
           i++;
           j = 0;
           // break;
         }
-        
-        chemin = (horloge.toString("YYMMDD/"));
+        chemin = (horloge.toString("YYMMDD"));
+        chemin += ("/");
         chemin += (i);
-        SD.mkdir(chemin.c_str());
-
-
-        chemin += (horloge.toString("/YYMMDD_"));
+        SD.mkdir(chemin);
+        delayMicroseconds(100);
+        chemin = (horloge.toString("YYMMDD"));
+        chemin += ("/");
+        chemin += (i);
+        chemin += ("/");
+        chemin += (horloge.toString("YYMMDD"));
+        chemin += ("-");
         chemin += (j);
-        chemin += (".log");
-        file = SD.open(chemin, FILE_WRITE);
+        chemin += (".LOG");
+        //Serial.println("-------");
+        
+        file = SD.open(chemin.c_str(), FILE_WRITE);
         Size = file.size();
+        Serial.println(chemin.c_str());
         file.close();
+        delayMicroseconds(100);
         if(MAX_SIZE > (Size + doc.length())){
           break;
-        }
+        }else{
           j++;
-        
+        }
          
       }
-
-      chemin = (horloge.toString("YYMMDD/"));
+      chemin = (horloge.toString("YYMMDD"));
+      chemin += ("/");
       chemin += (i);
-
     }
     else{
       chemin = horloge.toString("YYMMDD/0");
       SD.mkdir(chemin.c_str());
-
+      delayMicroseconds(100);
+      chemin = horloge.toString("YYMMDD/0");
     }
+  chemin += ("/");
+  chemin += (horloge.toString("YYMMDD"));
+  chemin += ("-");
+  chemin += (j);
+  chemin += (".LOG");
+  
+  file = SD.open(chemin.c_str(), FILE_WRITE);
+  file.print(doc);
+  file.close();
+  delayMicroseconds(100);
+  Serial.println(doc);
+  
 
   } else{
     Tab_refus[0] = true;
   }
 
-  chemin += (horloge.toString("/YYMMDD_"));
-  chemin += (j);
-  chemin += (".LOG");
-  file = SD.open(chemin, FILE_WRITE);
-  file.print(doc);
-  file.close();
-   Serial.println(chemin);
-  Serial.println(doc);
+
   
 }
 
@@ -738,7 +697,7 @@ Tab_refus[4] = false;
 
 
 void setup(){
-  Serial.begin(9600);
+  Serial.begin(38400);
   GPS_serial.begin(9600);
   (beginRTC());
   
@@ -760,8 +719,10 @@ if(digitalRead(2) == LOW){
 }
 
 void loop(){
+  unsigned long tempsPrecedent = millis();
 
  horloge = (nowRTC());
+
   if(!Mode_eco){
     Lecture_GPS();
   } else{
@@ -771,29 +732,30 @@ void loop(){
     Capteur_GPS.GPS_eco = !(Capteur_GPS.GPS_eco);
   }
 
+//Capteur_GPS.Valide = false;
 
 
   Lecture_luminosite();
   Lecture_TPH();
-
   // Traitement
-
-  File_temps_first();
   
+  File_temps_first();
 
+  
   Gestion_erreur();
-
   // Envoie
-
+TIMSK2 = 0b00000000;
   Envoie();
-
+TIMSK2 = 0b00000001;
   // Boucle de gestion du temps
 
-  unsigned long tempsPrecedent = millis();
+SD.end();
 
-//while(millis()-tempsPrecedent < (unsigned long)(60*1000*LOGINTERVAL*(1+(byte)Mode_eco))){
+  
+while(millis()-tempsPrecedent < 10000*(1+(byte)Mode_eco)){
 
-//}
+
+}
 
  
 }
