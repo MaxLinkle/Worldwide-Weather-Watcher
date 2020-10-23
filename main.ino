@@ -526,13 +526,14 @@ void Envoie(){
     return;
   }
 
-Tab_refus[4] = false;
-  // ---------------------------------------------------------------------------
+  Tab_refus[4] = false;
+   // Début de la construction du texte à envoyer -------------------------------
   String doc = "";
-  // Horloge
+
+  // Horloge *******************************************************************
   doc += (horloge.toString("YY/MM/DD hh:mm:ss"));
 
-  // GPS
+  // GPS ***********************************************************************
   doc += ("/Position:");
   if(!(Capteur_GPS).GPS_eco || !(Capteur_GPS).Valide){
    doc += ("NA");
@@ -550,39 +551,60 @@ Tab_refus[4] = false;
     doc += ((Capteur_GPS).EO);
   }
 
-  // Luminosite
+  // Luminosite ****************************************************************
   doc += ("/Luminosite:");
-  if((Capteur_L_TPH[0]).Valeur < LUMIN_LOW){
-    doc += ("LOW");
+  if(LUMIN == 0){
+    doc += ("NA");
   }
-  else if((Capteur_L_TPH[0]).Valeur >= LUMIN_LOW && (Capteur_L_TPH[0]).Valeur < LUMIN_HIGH){
-    doc += ("MEDUIM");
-  }
-  else if((Capteur_L_TPH[0]).Valeur >= LUMIN_HIGH){
-    doc += ("HIGH");
+  else{
+    if((Capteur_L_TPH[0]).Valeur < LUMIN_LOW){
+      doc += ("LOW");
+    }
+    else if((Capteur_L_TPH[0]).Valeur >= LUMIN_LOW && (Capteur_L_TPH[0]).Valeur < LUMIN_HIGH){
+      doc += ("MEDUIM");
+    }
+    else if((Capteur_L_TPH[0]).Valeur >= LUMIN_HIGH){
+      doc += ("HIGH");
+    }
   }
   doc += '\n';
 
-  // Temperature
+  // Temperature ***************************************************************
   doc += ("Temperature:");
-  doc += ((Capteur_L_TPH[1]).Valeur);
-  doc += ("C/");
-  doc += (int)(floor(((Capteur_L_TPH[1]).Valeur)*(9/5)+32));
-  doc += 'F';
+  if((Capteur_L_TPH[1]).Erreur || TEMP_AIR == 0){ // Envoie des données selon l'erreur du capteur
+    doc += ("NA");
+  }
+  else{
+    doc += ((Capteur_L_TPH[1]).Valeur);
+    doc += ("C/");
+    doc += (int)(floor(((Capteur_L_TPH[1]).Valeur)*(9/5)+32)); // Convertion de la températion en Fahrenheit
+    doc += 'F';
+  }
   doc += '\n';
 
-  // Pression
+  // Pression ******************************************************************
   doc += ("Pression:");
-  doc += ((Capteur_L_TPH[2]).Valeur);
+  if((Capteur_L_TPH[2]).Erreur || PRESSURE == 0){  // Envoie des données selon l'erreur du capteur
+    doc += ("NA");
+  }
+  else{
+    doc += ((Capteur_L_TPH[2]).Valeur);
+  }
   doc += ("HPa");
   doc += '\n';
 
-  // Hygrometrie
+  // Hygrometrie ***************************************************************
   doc += ("Hygrometrie:");
-  doc += ((Capteur_L_TPH[3]).Valeur);
+  if((Capteur_L_TPH[3]).Valeur == -1 || (Capteur_L_TPH[3]).Erreur || HYGR == 0){  // Envoie des données selon l'erreur du capteur
+    doc += ("NA");
+  }
+  else{
+    doc += ((Capteur_L_TPH[3]).Valeur);
+  }
   doc += ("g/m3");
   doc += '\n';
-  // ---------------------------------------------------------------------------
+  // fin de la construction du texte à envoyer ---------------------------------
+  
   File file;
   unsigned long Size;
   // unsigned long Size_card = (512*SdVolume.blocksPerCluster() * SdVolume.clusterCount());
