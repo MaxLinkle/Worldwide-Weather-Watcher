@@ -87,73 +87,62 @@ void reset(){
 
 // Fonction pour trouver l'adresse de la valeur pour la commande rentrée dans le moniteur série
 void Trouver(byte* adresse,String decoupe){
-    if (decoupe == "CLOCK="){
+
+// Avec notre makefile la partie de code commenté suivante n'arrive pas à ce compiler
+// mais cette partie ce compile trés bien avec l'IDE Arduino
+// n'hésiter donc pas a le decomenter et le teste mais uniquement sur l'IDE
+/*    if (decoupe == "CLOCK="){
       *adresse=-2;
  
-    }
-    else if (decoupe == "DATE=")
+    }else if (decoupe == "DATE=")
      *adresse=-3;
 
-   }
-   else if (decoupe == "LOG_INTERVALL="){
+   }else if(decoupe == "LOG_INTERVAL="){
     *adresse = 1;
 
-  }
-  else if (decoupe == "FILE_MAX_SIZE="){
+  }else if (decoupe == "FILE_MAX_SIZE="){
     *adresse = 3;
 
-  }
-  else if (decoupe == "TIMEOUT="){
+  }else if (decoupe == "TIMEOUT="){
     *adresse = 5;
 
-  }
-  else if (decoupe == "LUMIN="){
+  }else if (decoupe == "LUMIN="){
     *adresse = 7;
   
   }else if (decoupe == "LUMIN_LOW="){
     *adresse = 9;
 
-  }
-  else if (decoupe == "LUMIN_HIGH="){
+  }else if (decoupe == "LUMIN_HIGH="){
     *adresse = 11;
 
-  }
-  else if (decoupe == "TEMP_AIR="){
+  }else if (decoupe == "TEMP_AIR="){
     *adresse = 13;
   
-  }
-  else if (decoupe == "MIN_TEMP_AIR="){
+  }else if (decoupe == "MIN_TEMP_AIR="){
     *adresse = 15;
 
-  }
-  else if (decoupe == "MAX_TEMP_AIR="){
+  }else if (decoupe == "MAX_TEMP_AIR="){
     *adresse = 17;
 
-  }
-  else if (decoupe == "HYGR="){
+  }else if (decoupe == "HYGR="){
    *adresse = 19;
 
-  }
-  else if (decoupe == "HYGR_MINT="){
+  }else if (decoupe == "HYGR_MINT="){
    *adresse = 21;
 
-  }
-  else if (decoupe == "HYGR_MAXT="){
+  }else if (decoupe == "HYGR_MAXT="){
    *adresse = 23;
 
-  }
-  else if (decoupe == "PRESSURE="){
+  }else if (decoupe == "PRESSURE="){
    *adresse = 25;
 
-  }
-  else if (decoupe == "PRESSURE_MIN="){
+  }else if (decoupe == "PRESSURE_MIN="){
    *adresse = 27;
 
-  }
-  else if (decoupe == "PRESSURE_MAX="){
+  }else if (decoupe == "PRESSURE_MAX="){
    *adresse = 29;
   
-  }
+  }*/ 
 }
 
 
@@ -201,11 +190,9 @@ void Configuration(){
   }
   if (message == "RESET"){ // Si la commande est "RESET"
     reset();
-  }
-  else if (message == "VERSION"){ // Si la commande est "VERSION"
+  }else if (message == "VERSION"){ // Si la commande est "VERSION"
     Serial.println("1.0");
-  }
-  else{ // Si c'est un tout autre message
+  }else{ // Si c'est un tout autre message
     Message(&message);
   }
 }
@@ -216,48 +203,42 @@ void Configuration(){
 void Changement_LED(){
   if (Tab_refus[6]){ // Tempete/Cyclone ****************************************
     setColorRGB(255, 0, 0); // Led = rouge
-  }
-  else if (Tab_refus[5]){ // Erreur horloge ************************************
+  }else if (Tab_refus[5]){ // Erreur horloge ************************************
     if (varCompteur1 < 63){
       setColorRGB(255, 0, 0); // Led = rouge
     } 
     else{
       setColorRGB(0, 0, 255); // Led = bleu
     }
-  }
-  else if (Tab_refus[4]){// Erreur d'ecriture de la carte SD ******************
+  }else if (Tab_refus[4]){// Erreur d'ecriture de la carte SD ******************
     if (varCompteur1 < 42){
       setColorRGB(255, 0, 0); // Led = rouge
     } 
     else{
       setColorRGB(255, 255, 255); // Led = blanche
     }
-  }
-  else if (Tab_refus[3]){ // Erreur de GPS *************************************
+  }else if (Tab_refus[3]){ // Erreur de GPS *************************************
     if (varCompteur1 < 63){
       setColorRGB(255, 0, 0); // Led = rouge
     } 
     else{
       setColorRGB(255, 255, 0); // Led = jaune
     }
-  }
-  else if (Tab_refus[2]){ // Erreur d'accees aux capteurs **********************
+  }else if (Tab_refus[2]){ // Erreur d'accees aux capteurs **********************
     if (varCompteur1 < 63){
       setColorRGB(255, 0, 0); // Led = rouge
     } 
     else{
       setColorRGB(0, 255, 0); // Led = vert
     }
-  }
-  else if (Tab_refus[1]){ // Erreur de donnée incoerante ou en dehors des valeurs definits
+  }else if (Tab_refus[1]){ // Erreur de donnée incoerante ou en dehors des valeurs definits
     if (varCompteur1 < 42){
       setColorRGB(255, 0, 0); // Led = rouge
     } 
     else{
       setColorRGB(0, 255, 0); // Led  = vert
     }
-  }
-  else if (Tab_refus[0]){ // Carte SD pleine ***********************************
+  }else if (Tab_refus[0]){ // Carte SD pleine ***********************************
     if (varCompteur1 < 63){
       setColorRGB(255, 0, 0); // Led = rouge
     } 
@@ -280,8 +261,7 @@ void Interruption(){
   if(!digitalRead(2) || !digitalRead(3)){ // Si boutons appuyer on active le timer de 5 secondes
     TIMSK1 = 0b00000010;
 
-  }
-  else{
+  }else{
     if(digitalRead(2) && digitalRead(3)){// Si boutons lacher reinitialiser timer de 5 secondes
       TIMSK1 = 0b00000000;
       varCompteur2 = 0;
@@ -303,8 +283,7 @@ ISR(TIMER2_OVF_vect){
 ISR(TIMER1_COMPA_vect){
   if(varCompteur2<5){
     varCompteur2++; //Compte des secondes de pression des boutons 
-  }
-  else if(varCompteur2 == 5){
+  }else if(varCompteur2 == 5){
      varCompteur2++;
     /*if(digitalRead(2)== LOW && digitalRead(3)==LOW){
 //Decommenter pour 2 bouton 
@@ -350,7 +329,7 @@ void setup_Interruption(){
 }
 
 void setup_EEPROM(){
-  if (EEPROM.read(0) == 0){
+  if (EEPROM.read(0) != 0){
     reset();
   }
 }
@@ -508,11 +487,14 @@ void PrintDirectory_temps(File dir,char date[]){
 
 void File_temps_first(){
   if(isrunning()){
+    if(!SD.begin()){
     File root = SD.open("/");
-    PrintDirectory_temps(root, (nowRTC()).toString("AAMMDD"));
+    PrintDirectory_temps(root, (horloge).toString("AAMMDD"));
     root.close();
-  }
-  else{
+    }else{
+      Tab_refus[4]=true;
+      }
+  }else{
     Tab_refus[5]=true;
   }
 }
@@ -555,8 +537,7 @@ void Envoie(){
   doc += ("/Luminosite:");
   if(LUMIN == 0){
     doc += ("NA");
-  }
-  else{
+  }else{
     if((Capteur_L_TPH[0]).Valeur < LUMIN_LOW){
       doc += ("LOW");
     }
@@ -573,8 +554,7 @@ void Envoie(){
   doc += ("Temperature:");
   if((Capteur_L_TPH[1]).Erreur || TEMP_AIR == 0){ // Envoie des données selon l'erreur du capteur
     doc += ("NA");
-  }
-  else{
+  }else{
     doc += ((Capteur_L_TPH[1]).Valeur);
     doc += ("C/");
     doc += (int)(floor(((Capteur_L_TPH[1]).Valeur)*(9/5)+32)); // Convertion de la températion en Fahrenheit
@@ -586,8 +566,7 @@ void Envoie(){
   doc += ("Pression:");
   if((Capteur_L_TPH[2]).Erreur || PRESSURE == 0){  // Envoie des données selon l'erreur du capteur
     doc += ("NA");
-  }
-  else{
+  }else{
     doc += ((Capteur_L_TPH[2]).Valeur);
   }
   doc += ("HPa");
@@ -597,8 +576,7 @@ void Envoie(){
   doc += ("Hygrometrie:");
   if((Capteur_L_TPH[3]).Valeur == -1 || (Capteur_L_TPH[3]).Erreur || HYGR == 0){  // Envoie des données selon l'erreur du capteur
     doc += ("NA");
-  }
-  else{
+  }else{
     doc += ((Capteur_L_TPH[3]).Valeur);
   }
   doc += ("g/m3");
@@ -607,7 +585,7 @@ void Envoie(){
   
   File file;
   unsigned long Size;
-  // unsigned long Size_card = (512*SdVolume.blocksPerCluster() * SdVolume.clusterCount());
+  
   
   File root = SD.open("/");
   Size = SD.Taille_carte() - root.size();
@@ -644,7 +622,7 @@ void Envoie(){
         
         file = SD.open(chemin.c_str(), FILE_WRITE);
         Size = file.size();
-        Serial.println(chemin.c_str());
+        //Serial.println(chemin.c_str());
         file.close();
         delayMicroseconds(100);
         if(MAX_SIZE > (Size + doc.length())){
@@ -742,7 +720,7 @@ void loop(){
   SD.end();
   
   // Delay *********************************************************************
-  while(millis()-tempsPrecedent < 10000*(1+(byte)Mode_eco)){
-    // le code se bloquera dans cette boucle while pendant la duree LOGINTERVALL (de base 10 min) et ensuite reprendra la boucle loop ensuite
-  } 
+while(millis()-tempsPrecedent < 60*1000*LOGINTERVAL*(1+(byte)Mode_eco)){
+//   le code se bloquera dans cette boucle while pendant la duree LOGINTERVAL (de base 10 min) et ensuite reprendra la boucle loop ensuite
+}
 }
