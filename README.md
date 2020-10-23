@@ -28,3 +28,7 @@ Cette librairie est également appelé directement dans le makefile.
 Il s'agit du code principal. 
 Pour plus d'information à sont sujet n'hésité pas à aller voire les commentaires dans le code en lui même.
 Ils vous expliqueront plus en détail l'utilité des fonctions et différentes oppération que nous effectuons. 
+
+## result
+
+Vous trouverez un exemple de resultat d'envoie dans ce dossier.
